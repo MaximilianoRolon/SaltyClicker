@@ -1,0 +1,2 @@
+# SaltyClicker
+Salty Game
