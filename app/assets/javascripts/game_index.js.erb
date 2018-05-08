@@ -50,6 +50,10 @@ var GameState = {
     		fill: '#fff',
     		strokeThickness: 4
 		});
+
+        // Timer
+	 	game.time.events.loop(Phaser.Timer.SECOND * 2, saltClickDownAndUp, this, saltSprite);
+
 	},
 
 	update: function() {
@@ -65,7 +69,6 @@ function saltClickDown (saltSprite) {
     counter++;
     this.player.salt += 1;
     this.playerSaltText.text = 'Sal: ' + this.player.salt;
-
     // Scale image down
     saltSprite.scale.setTo(0.52, 0.52);
 }
@@ -76,6 +79,20 @@ function saltClickUp (saltSprite) {
     // Revert image scale
     saltSprite.scale.setTo(0.5,0.5);
 
+}
+
+function saltClickDownAndUp (saltSprite) {
+
+	// Add salt and show on screen
+    counter++;
+    this.player.salt += 1;
+    this.playerSaltText.text = 'Sal: ' + this.player.salt;
+    // Scale image down
+    saltSprite.scale.setTo(0.52, 0.52);
+    setTimeout(function(){
+    	saltSprite.scale.setTo(0.5,0.5);
+	}, 50);
+    
 }
 
 
