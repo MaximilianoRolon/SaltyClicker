@@ -1,0 +1,84 @@
+var game = new Phaser.Game(640, 360, Phaser.AUTO)
+// Click counter
+var counter = 0;
+
+var GameState = {
+
+	preload: function() { 
+		// Preload assets	
+		this.load.image('salt',"<%= asset_path('Salt_Unclicked.png') %>");
+		this.load.image('forest',"<%= asset_path('forest.png') %>");
+	},
+
+	create: function() {
+		// Background image initialization
+        var forestBackground = game.add.sprite(0, 0, 'forest');
+
+
+		// Salt image initialize
+        var saltSprite = game.add.sprite(320, 180, 'salt');
+
+
+
+        // Scale of the images
+        saltSprite.scale.setTo(0.5,0.5);
+        forestBackground.scale.setTo(2, 1.5);
+
+        // Point of modification of the images
+        saltSprite.anchor.setTo(0.5, 0.5);
+        forestBackground.anchor.setTo(0.5, 0.5);
+
+        // Input text initializer
+        clickText = game.add.text(250, 16, '', { fill: '#ffffff' });
+
+        //  Enables all kind of input actions on this image (click, etc)
+    	saltSprite.inputEnabled = true;
+
+       	// User inputs
+        saltSprite.events.onInputDown.add(saltClickDown, this);
+        saltSprite.events.onInputUp.add(saltClickUp, this);
+
+        // Player stats
+        this.player = {
+    		clickDmg: 1,
+    		salt: 0
+		};
+
+		// Player salt text
+		this.playerSaltText = this.add.text(30, 30, 'Sal: ' + this.player.salt, {
+    		font: '24px Arial Black',
+    		fill: '#fff',
+    		strokeThickness: 4
+		});
+	},
+
+	update: function() {
+
+	}
+
+};
+
+// On salt image click down
+function saltClickDown (saltSprite) {
+
+	// Add salt and show on screen
+    counter++;
+    this.player.salt += 1;
+    this.playerSaltText.text = 'Sal: ' + this.player.salt;
+
+    // Scale image down
+    saltSprite.scale.setTo(0.52, 0.52);
+}
+
+// On salt image click up
+function saltClickUp (saltSprite) {
+
+    // Revert image scale
+    saltSprite.scale.setTo(0.5,0.5);
+
+}
+
+
+game.state.add('GameState', GameState);
+
+game.state.start('GameState');
