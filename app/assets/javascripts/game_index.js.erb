@@ -11,6 +11,7 @@ var GameState = {
 	},
 
 	create: function() {
+		
 		// Background image initialization
         var forestBackground = game.add.sprite(0, 0, 'forest');
 
@@ -51,8 +52,32 @@ var GameState = {
     		strokeThickness: 4
 		});
 
+		// Damage text initialization and animation
+		this.dmgTextPool = this.add.group();
+		var dmgText;
+		for (var d=0; d<50; d++) {
+    		dmgText = this.add.text(0, 0, '1', {
+        		font: '24px Arial Black',
+        		fill: '#fff',
+        		strokeThickness: 4
+    		});
+    		// start out not existing, so we don't draw it yet
+    		dmgText.exists = false;
+    		dmgText.tween = game.add.tween(dmgText)
+        		.to({
+            		alpha: 0,
+            		y: this.game.rnd.integerInRange(50, 260),
+            		x: this.game.rnd.integerInRange(200, 440)
+        		}, 1000, Phaser.Easing.Cubic.Out);
+		
+    		dmgText.tween.onComplete.add(function(text, tween) {
+        		text.kill();
+    		});
+    		this.dmgTextPool.add(dmgText);
+		}
+
         // Timer
-	 	game.time.events.loop(Phaser.Timer.SECOND * 2, saltClickDownAndUp, this, saltSprite);
+	 	// game.time.events.loop(Phaser.Timer.SECOND * 2, saltClickDownAndUp, this, saltSprite);
 
 	},
 
@@ -65,9 +90,20 @@ var GameState = {
 // On salt image click down
 function saltClickDown (saltSprite) {
 
+	// Show damage text
+	var dmgText = this.dmgTextPool.getFirstExists(false);
+	if (dmgText) {
+    	dmgText.text = "+" + this.player.clickDmg;
+    	dmgText.reset(game.input.mousePointer.x, game.input.mousePointer.y);
+    	dmgText.alpha = 1;
+    	dmgText.tween.start();
+	}
+
+	this.player.salt += 1
+	var salt = this.player.salt;
 	// Add salt and show on screen
     counter++;
-    this.player.salt += 1;
+    
     this.playerSaltText.text = 'Sal: ' + this.player.salt;
     // Scale image down
     saltSprite.scale.setTo(0.52, 0.52);
