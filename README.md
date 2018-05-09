@@ -1,24 +1,23 @@
-# README
+# Salty Clicker
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Salty clicker es un juego de tipo incremental en desarrollo por el equipo de jugadores <strong><font size="6">FKBZ</font></strong>
 
-Things you may want to cover:
+<img src="app/assets/Salt_Unclicked.png" alt="Sal">
 
-* Ruby version
+# Nuestro equipo
 
-* System dependencies
+<ul>
+  <li>Maximiliano: Desarrollador general</li>
+  <li>Ignacio: Diseñador general</li>
+  <li>Marcos</li>
+  <li>Juan</li>
+  <li>Jara</li>
+</ul>
 
-* Configuration
+# TO-DO
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+<ul style="list-style-type:disc">
+  <li><del>Setup inicial</del></li>
+  <li><del>Autentificacion en DB</del></li>
+  <li>Requests asincrónicos de data</li>
+</ul>
