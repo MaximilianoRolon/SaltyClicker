@@ -9,7 +9,7 @@ Salty clicker es un juego de tipo incremental en desarrollo por el equipo de jug
 <ul>
   <li>Maximiliano: Desarrollador general</li>
   <li>Ignacio: Diseñador general</li>
-  <li>Nahuel: Director general de pruebas</li>
+  <li>Nahuel: Director general de pruebas </li>
   <li>Marcos</li>
   <li>Juan</li>
   <li>Jara</li>
