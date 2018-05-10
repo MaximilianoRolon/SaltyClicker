@@ -32,6 +32,8 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  config.action_view.embed_authenticity_token_in_remote_forms = true
+
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   # Raises error for missing translations

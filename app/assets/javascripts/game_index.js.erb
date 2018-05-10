@@ -1,3 +1,6 @@
+
+
+
 var game = new Phaser.Game(640, 360, Phaser.AUTO)
 // Click counter
 var counter = 0;
@@ -8,6 +11,7 @@ var GameState = {
 		// Preload assets	
 		this.load.image('salt',"<%= asset_path('Salt_Unclicked.png') %>");
 		this.load.image('forest',"<%= asset_path('forest.png') %>");
+        this.load.image('saveButton',"<%= asset_path('saveIcon.png') %>");
 	},
 
 	create: function() {
@@ -19,21 +23,29 @@ var GameState = {
 		// Salt image initialize
         var saltSprite = game.add.sprite(320, 180, 'salt');
 
-
-
-        // Scale of the images
-        saltSprite.scale.setTo(0.5,0.5);
-        forestBackground.scale.setTo(2, 1.5);
+        // Save button
+        var saveButton = game.add.button(550, 50, 'saveButton', saveButtonClick, this, 2, 1, 0);
 
         // Point of modification of the images
         saltSprite.anchor.setTo(0.5, 0.5);
         forestBackground.anchor.setTo(0.5, 0.5);
+        saveButton.anchor.setTo(0.5,0.5);
+
+        // Scale of the images
+        saltSprite.scale.setTo(0.5,0.5);
+        forestBackground.scale.setTo(2, 1.5);
+        saveButton.scale.setTo(0.15,0.15);
 
         // Input text initializer
         clickText = game.add.text(250, 16, '', { fill: '#ffffff' });
 
         //  Enables all kind of input actions on this image (click, etc)
     	saltSprite.inputEnabled = true;
+
+        saltSprite.input.pixelPerfectOver = true;
+        saltSprite.input.pixelPerfectClick = true;
+
+        saltSprite.input.useHandCursor = true;
 
        	// User inputs
         saltSprite.events.onInputDown.add(saltClickDown, this);
@@ -42,7 +54,7 @@ var GameState = {
         // Player stats
         this.player = {
     		clickDmg: 1,
-    		salt: 0
+    		salt: gon.user_salt
 		};
 
 		// Player salt text
@@ -75,7 +87,7 @@ var GameState = {
     		});
     		this.dmgTextPool.add(dmgText);
 		}
-
+        
         // Timer
 	 	// game.time.events.loop(Phaser.Timer.SECOND * 2, saltClickDownAndUp, this, saltSprite);
 
@@ -86,6 +98,20 @@ var GameState = {
 	}
 
 };
+
+// On save button click
+function saveButtonClick () {
+    // Save user stats on DB
+    $.ajax({
+        type: "POST",
+        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+        url: "/pages/set_stats",
+        data: "salt=" + this.player.salt +"&current_user=" + gon.current_user,
+        success: function(msg){
+            alert("Game saved")
+        }
+    });
+}
 
 // On salt image click down
 function saltClickDown (saltSprite) {
@@ -107,6 +133,7 @@ function saltClickDown (saltSprite) {
     this.playerSaltText.text = 'Sal: ' + this.player.salt;
     // Scale image down
     saltSprite.scale.setTo(0.52, 0.52);
+
 }
 
 // On salt image click up

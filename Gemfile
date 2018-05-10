@@ -5,6 +5,10 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+# Share variables between controller and js
+gem 'gon'
+# MySql database gem
+gem 'mysql2', '~> 0.5.1'
 # Authentification library
 gem 'devise'
 # Javascript game library
