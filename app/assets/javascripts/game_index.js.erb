@@ -1,7 +1,7 @@
 
 
 
-var game = new Phaser.Game(640, 360, Phaser.AUTO)
+var game = new Phaser.Game(1000, 360, Phaser.AUTO)
 // Click counter
 var counter = 0;
 
@@ -12,6 +12,7 @@ var GameState = {
 		this.load.image('salt',"<%= asset_path('Salt_Unclicked.png') %>");
 		this.load.image('forest',"<%= asset_path('forest.png') %>");
         this.load.image('saveButton',"<%= asset_path('saveIcon.png') %>");
+        this.load.image('upgradeButton',"<%= asset_path('Upgrade_Button.png') %>");
 	},
 
 	create: function() {
@@ -26,15 +27,20 @@ var GameState = {
         // Save button
         var saveButton = game.add.button(550, 50, 'saveButton', saveButtonClick, this, 2, 1, 0);
 
+        // Upgrade button
+        var upgradeButton = game.add.button(800, 310, 'upgradeButton', upgradeButtonClick, this, 2, 1, 0);        
+
         // Point of modification of the images
         saltSprite.anchor.setTo(0.5, 0.5);
         forestBackground.anchor.setTo(0.5, 0.5);
         saveButton.anchor.setTo(0.5,0.5);
+        upgradeButton.anchor.setTo(0.5,0.5);
 
         // Scale of the images
         saltSprite.scale.setTo(0.5,0.5);
         forestBackground.scale.setTo(2, 1.5);
         saveButton.scale.setTo(0.15,0.15);
+        upgradeButton.scale.setTo(0.5,0.5);
 
         // Input text initializer
         clickText = game.add.text(250, 16, '', { fill: '#ffffff' });
@@ -54,15 +60,38 @@ var GameState = {
         // Player stats
         this.player = {
     		clickDmg: 1,
-    		salt: gon.user_salt
+    		salt: gon.user_salt,
+            saltPerSecond: gon.user_salt_per_second,
+            upgradePrize: gon.user_salt_per_second * gon.user_salt_per_second * 500 + 100
 		};
 
-		// Player salt text
-		this.playerSaltText = this.add.text(30, 30, 'Sal: ' + this.player.salt, {
-    		font: '24px Arial Black',
-    		fill: '#fff',
-    		strokeThickness: 4
-		});
+        // Player salt text
+        this.playerSaltText = this.add.text(30, 30, 'Sal: ' + this.player.salt, {
+            font: '24px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
+        });
+
+        // Player salt text
+        this.playerSaltPerSecondText = this.add.text(30, 70, 'Sal/Seg: ' + this.player.saltPerSecond, {
+            font: '24px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
+        });   
+
+        // Player salt text
+        this.playerClickDmgText = this.add.text(30, 110, 'Sal/Click: ' + this.player.clickDmg, {
+            font: '24px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
+        }); 
+
+        // Player salt text
+        this.upgradeButtonPriceText = this.add.text(785, 330, '' + this.player.upgradePrize, {
+            font: '18px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
+        });     
 
 		// Damage text initialization and animation
 		this.dmgTextPool = this.add.group();
@@ -89,15 +118,45 @@ var GameState = {
 		}
         
         // Timer
-	 	// game.time.events.loop(Phaser.Timer.SECOND * 2, saltClickDownAndUp, this, saltSprite);
+	 	//timer = this.game.time.create(false);
+        this.timer = this.game.time.events.loop(Phaser.Timer.SECOND, this.saltTimer, this);
 
 	},
 
 	update: function() {
 
-	}
+	},
+
+    saltTimer: function() {
+        if (this.player.saltPerSecond){
+            this.player.salt += this.player.saltPerSecond;
+            this.playerSaltText.text = 'Sal: ' + this.player.salt;
+        }
+    }
 
 };
+
+
+function upgradeButtonClick () {
+    if (this.player.salt >= this.player.upgradePrize){
+        this.player.salt = this.player.salt - this.player.upgradePrize
+        this.playerSaltText.text = 'Sal: ' + this.player.salt;
+        if (this.player.saltPerSecond){
+            this.player.saltPerSecond += 1;            
+            this.player.playerSaltPerSecondText = this.player.saltPerSecond;
+        }else{
+            this.player.playerSaltPerSecondText = 1;
+            this.player.saltPerSecond = 1;
+        }
+    
+        this.player.upgradePrize = this.player.saltPerSecond * this.player.saltPerSecond * 500 + 100
+        this.playerSaltPerSecondText.text = 'Sal/Seg: ' + this.player.playerSaltPerSecondText;
+        this.upgradeButtonPriceText.text = this.player.upgradePrize
+    
+    }else{
+        alert("No te alcanza la sal papá! volve al fortnite!")
+    }
+}
 
 // On save button click
 function saveButtonClick () {
@@ -106,11 +165,10 @@ function saveButtonClick () {
         type: "POST",
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
         url: "/pages/set_stats",
-        data: "salt=" + this.player.salt +"&current_user=" + gon.current_user,
-        success: function(msg){
-            alert("Game saved")
+        data: "salt=" + this.player.salt +"&current_user=" + gon.current_user + "&saltPerSecond=" + this.player.playerSaltPerSecondText,
+        success: function(msg){   
         }
-    });
+    });  
 }
 
 // On salt image click down
