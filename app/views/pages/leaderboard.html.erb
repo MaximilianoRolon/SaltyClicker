@@ -13,14 +13,24 @@
   			<% @i = 1 %>
 			<% @users.each do |user| %>
 			<tr>
-      		<th scope="row"><%= @i %></th>
+      		<th scope="row"><%= @i %>
+      		<% if @i = 1 %>
+      			<i class="fa fa-bookmark" style="color: gold" ></i>
+      		<% elsif @i = 2 or @i = 3 or @i = 4%>
+      				<i class="fa fa-bookmark" style="color: silver" ></i>
+      		<% elsif @i = 5 or @i = 6 or @i = 7%>
+      				<i class="fa fa-bookmark" style="color: #CD7F32" ></i>
+      		<% end %>      				
+      		</th>
       		<td><%= user.email %></td>
       		<td><%= user.salt_per_second %></td>
       		<td><%= user.salt %></td>
     		</tr>
 			<% @i = @i + 1 %>
 			<% end %>
+
   		</tbody>
 		</table>
 	</div>
 </div>
+

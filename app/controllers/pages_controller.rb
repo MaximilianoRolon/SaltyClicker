@@ -19,7 +19,7 @@ class PagesController < ApplicationController
 	end
 
 	def leaderboard
-		@users = User.all.order("salt DESC")
+		@users = User.all.order("salt_per_second DESC")
 	end
 
 	def set_stats
