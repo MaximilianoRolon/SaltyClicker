@@ -16,6 +16,10 @@ class PagesController < ApplicationController
 		#@user_clickDamage = User.find(1).salt
 	end
 
+	def leaderboard
+		@users = User.all.order("salt DESC")
+	end
+
 	def set_stats
 		User.find(params[:current_user]).update_attributes(:salt => params[:salt])
 	end

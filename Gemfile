@@ -6,7 +6,6 @@ git_source(:github) do |repo_name|
 end
 
 gem 'execjs'
-gem 'therubyracer'
 # Share variables between controller and js
 gem 'gon'
 # MySql database gem
