@@ -1,5 +1,5 @@
 <% @i = 1 %>
 <% @users.each do |user| %>
 	<p><strong><%= user.email %></strong> es el numero <%= @i %> con <strong><%= user.salt %></strong> sal</p> 
-	<% @i++ %>
+	<% @i = @i + 1 %>
 <% end %>
