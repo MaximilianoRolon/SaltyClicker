@@ -62,7 +62,7 @@ var GameState = {
     		clickDmg: 1,
     		salt: gon.user_salt,
             saltPerSecond: gon.user_salt_per_second,
-            upgradePrize: gon.user_salt_per_second * gon.user_salt_per_second * 500 + 100
+            upgradePrize: Math.round(100 +(20*(Math.pow(gon.user_salt_per_second, 1.25))))
 		};
 
         // Player salt text
@@ -149,7 +149,7 @@ function upgradeButtonClick () {
             this.player.saltPerSecond = 1;
         }
     
-        this.player.upgradePrize = this.player.saltPerSecond * this.player.saltPerSecond * 500 + 100
+        this.player.upgradePrize = Math.round(100 +(20*(Math.pow(this.player.saltPerSecond, 1.25))))
         this.playerSaltPerSecondText.text = 'Sal/Seg: ' + this.player.playerSaltPerSecondText;
         this.upgradeButtonPriceText.text = this.player.upgradePrize
     
@@ -167,6 +167,7 @@ function saveButtonClick () {
         url: "/pages/set_stats",
         data: "salt=" + this.player.salt +"&current_user=" + gon.current_user + "&saltPerSecond=" + this.player.playerSaltPerSecondText,
         success: function(msg){   
+            alert("Cambio guardados correctamente!")
         }
     });  
 }
