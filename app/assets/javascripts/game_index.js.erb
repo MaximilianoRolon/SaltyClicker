@@ -13,6 +13,7 @@ var GameState = {
 		this.load.image('forest',"<%= asset_path('forest.png') %>");
         this.load.image('saveButton',"<%= asset_path('saveIcon.png') %>");
         this.load.image('upgradeButton',"<%= asset_path('Upgrade_Button.png') %>");
+        this.load.image('upgradeButtonSaltRock',"<%= asset_path('Upgrade_Button_Salt_Rock.png') %>");
 	},
 
 	create: function() {
@@ -27,20 +28,23 @@ var GameState = {
         // Save button
         var saveButton = game.add.button(550, 50, 'saveButton', saveButtonClick, this, 2, 1, 0);
 
-        // Upgrade button
-        var upgradeButton = game.add.button(800, 310, 'upgradeButton', upgradeButtonClick, this, 2, 1, 0);        
+        // Upgrade buttons
+        var upgradeButton = game.add.button(800, 230, 'upgradeButton', upgradeButtonClick, this, 2, 1, 0);  
+        var upgradeButtonSaltRock = game.add.button(800, 130, 'upgradeButtonSaltRock', upgradeButtonSaltRockClick, this, 2, 1, 0);        
 
         // Point of modification of the images
         saltSprite.anchor.setTo(0.5, 0.5);
         forestBackground.anchor.setTo(0.5, 0.5);
         saveButton.anchor.setTo(0.5,0.5);
         upgradeButton.anchor.setTo(0.5,0.5);
+        upgradeButtonSaltRock.anchor.setTo(0.5,0.5);
 
         // Scale of the images
         saltSprite.scale.setTo(0.5,0.5);
         forestBackground.scale.setTo(2, 1.5);
         saveButton.scale.setTo(0.15,0.15);
         upgradeButton.scale.setTo(0.5,0.5);
+        upgradeButtonSaltRock.scale.setTo(0.5,0.5);
 
         // Input text initializer
         clickText = game.add.text(250, 16, '', { fill: '#ffffff' });
@@ -59,10 +63,11 @@ var GameState = {
 
         // Player stats
         this.player = {
-    		clickDmg: 1,
+    		clickDmg: gon.user_click_damage,
     		salt: gon.user_salt,
             saltPerSecond: gon.user_salt_per_second,
-            upgradePrize: Math.round(100 +(20*(Math.pow(gon.user_salt_per_second, 1.25))))
+            upgradePrize: Math.round(100 +(20*(Math.pow(gon.user_salt_per_second, 1.25)))),
+            upgradeSaltRockPrize: Math.round(100 +(20*(Math.pow(gon.user_click_damage, 1.6))))
 		};
 
         // Player salt text
@@ -87,11 +92,18 @@ var GameState = {
         }); 
 
         // Player salt text
-        this.upgradeButtonPriceText = this.add.text(785, 330, '' + this.player.upgradePrize, {
+        this.upgradeButtonPriceText = this.add.text(795, 250, '' + this.player.upgradePrize, {
             font: '18px Arial Black',
             fill: '#fff',
             strokeThickness: 4
-        });     
+        });
+
+        // Player salt text
+        this.upgradeButtonSaltRockPriceText = this.add.text(795, 150, '' + this.player.upgradeSaltRockPrize, {
+            font: '18px Arial Black',
+            fill: '#fff',
+            strokeThickness: 4
+        });
 
 		// Damage text initialization and animation
 		this.dmgTextPool = this.add.group();
@@ -136,6 +148,24 @@ var GameState = {
 
 };
 
+function upgradeButtonSaltRockClick () {
+    if (this.player.salt >= this.player.upgradeSaltRockPrize){
+        this.player.salt = this.player.salt - this.player.upgradeSaltRockPrize
+        this.playerSaltText.text = 'Sal: ' + this.player.salt;
+        if (this.player.clickDmg){
+            this.player.clickDmg += 1;            
+        }else{
+            this.player.clickDmg = 1;
+        }
+        this.player.playerClickDmgText = this.player.clickDmg;
+        this.player.upgradeSaltRockPrize = Math.round(100 +(20*(Math.pow(this.player.clickDmg, 1.6))))
+        this.playerClickDmgText.text = 'Sal/Click: ' + this.player.playerClickDmgText;
+        this.upgradeButtonSaltRockPriceText.text = this.player.upgradeSaltRockPrize
+    
+    }else{
+        alert("No te alcanza la sal papá! volve al fortnite!")
+    }    
+}
 
 function upgradeButtonClick () {
     if (this.player.salt >= this.player.upgradePrize){
@@ -165,7 +195,7 @@ function saveButtonClick () {
         type: "POST",
         beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
         url: "/pages/set_stats",
-        data: "salt=" + this.player.salt +"&current_user=" + gon.current_user + "&saltPerSecond=" + this.player.playerSaltPerSecondText,
+        data: "salt=" + this.player.salt +"&current_user=" + gon.current_user + "&saltPerSecond=" + this.player.saltPerSecond + "&clickDamage=" + this.player.clickDmg,
         success: function(msg){   
             alert("Cambio guardados correctamente!")
         }
@@ -184,7 +214,7 @@ function saltClickDown (saltSprite) {
     	dmgText.tween.start();
 	}
 
-	this.player.salt += 1
+	this.player.salt += this.player.clickDmg
 	var salt = this.player.salt;
 	// Add salt and show on screen
     counter++;

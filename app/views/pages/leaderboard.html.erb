@@ -6,6 +6,7 @@
       		<th scope="col">#</th>
       		<th scope="col">Usuario</th>
       		<th scope="col">Sal/seg</th>
+          <th scope="col">Sal/click</th>
       		<th scope="col">Sal</th>
     		</tr>
   		</thead>
@@ -24,7 +25,12 @@
       		</th>
       		<td><%= user.email %></td>
       		<td><%= user.salt_per_second %></td>
-      		<td><%= user.salt %></td>
+          <% if user.click_damage == nil or user.click_damage == 0 %>
+            <td><%= 1 %></td>
+          <% else %>
+            <td><%= user.click_damage %></td>
+          <% end %>
+      		<td><h6><%= user.salt %></h6></td>
     		</tr>
 			<% @i = @i + 1 %>
 			<% end %>
