@@ -1,5 +1,26 @@
-<% @i = 1 %>
-<% @users.each do |user| %>
-	<p><strong><%= user.email %></strong> es el numero <%= @i %> con <strong><%= user.salt %></strong> sal</p> 
-	<% @i = @i + 1 %>
-<% end %>
+<div class="row">
+	<div class="col-6 push-3">
+		<table class="table table-dark">
+  		<thead>
+    		<tr>
+      		<th scope="col">#</th>
+      		<th scope="col">Usuario</th>
+      		<th scope="col">Sal/seg</th>
+      		<th scope="col">Sal</th>
+    		</tr>
+  		</thead>
+  		<tbody>
+  			<% @i = 1 %>
+			<% @users.each do |user| %>
+			<tr>
+      		<th scope="row"><%= @i %></th>
+      		<td><%= user.email %></td>
+      		<td><%= user.salt_per_second %></td>
+      		<td><%= user.salt %></td>
+    		</tr>
+			<% @i = @i + 1 %>
+			<% end %>
+  		</tbody>
+		</table>
+	</div>
+</div>
