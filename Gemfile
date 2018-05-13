@@ -5,6 +5,8 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+gem 'execjs'
+gem 'therubyracer'
 # Share variables between controller and js
 gem 'gon'
 # MySql database gem
@@ -16,7 +18,7 @@ gem 'phaser-rails'
 # Javascript sintax and utility library
 gem 'jquery-rails'
 # Bootstrap Frontend
-gem 'bootstrap', '~> 4.1.1'
+gem 'bootstrap'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.3'
 # Use sqlite3 as the database for Active Record
