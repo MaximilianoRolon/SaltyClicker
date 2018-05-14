@@ -25,4 +25,5 @@ Salty clicker es un juego de tipo incremental en desarrollo por el equipo de jug
   <li>Refactorizar el codigo del componente principal del juego (js)</li>
   <li>Prepara la DB por usuario con data de status</li>
   <li>Preparar los request asincrónicos para que reflejen los cambios a la DB</li>
+  <li>Fixear bugs de 0 salt per second al guardar en DB</li>
 </ul>
