@@ -2,25 +2,29 @@
 
 
 var game = new Phaser.Game(1000, 360, Phaser.AUTO)
+
 // Click counter
 var counter = 0;
+// Time counter
+var lastTime = 0;
+var saveInterval = 60 * 5;
 
 var GameState = {
 
 	preload: function() { 
 		// Preload assets	
 		this.load.image('salt',"<%= asset_path('Salt_Unclicked.png') %>");
-		this.load.image('forest',"<%= asset_path('forest.png') %>");
+		this.load.image('mineBackground',"<%= asset_path('Fondo.png') %>");
         this.load.image('saveButton',"<%= asset_path('saveIcon.png') %>");
         this.load.image('upgradeButton',"<%= asset_path('Upgrade_Button.png') %>");
         this.load.image('upgradeButtonSaltRock',"<%= asset_path('Upgrade_Button_Salt_Rock.png') %>");
+        //this.load.image('circleButton',"<%= asset_path('Circle.png') %>");
 	},
 
 	create: function() {
 		
 		// Background image initialization
-        var forestBackground = game.add.sprite(0, 0, 'forest');
-
+        var mineBackground = game.add.sprite(500, 180, 'mineBackground');
 
 		// Salt image initialize
         var saltSprite = game.add.sprite(320, 180, 'salt');
@@ -30,32 +34,41 @@ var GameState = {
 
         // Upgrade buttons
         var upgradeButton = game.add.button(800, 230, 'upgradeButton', upgradeButtonClick, this, 2, 1, 0);  
-        var upgradeButtonSaltRock = game.add.button(800, 130, 'upgradeButtonSaltRock', upgradeButtonSaltRockClick, this, 2, 1, 0);        
+        var upgradeButtonSaltRock = game.add.button(800, 130, 'upgradeButtonSaltRock', upgradeButtonSaltRockClick, this, 2, 1, 0);
+
+        // Salt activator initialization
+        //var circleButton = game.add.button(500, 180, 'circleButton', circleButtonClick, this, 2, 1, 0);        
 
         // Point of modification of the images
         saltSprite.anchor.setTo(0.5, 0.5);
-        forestBackground.anchor.setTo(0.5, 0.5);
+        mineBackground.anchor.setTo(0.5, 0.5);
         saveButton.anchor.setTo(0.5,0.5);
         upgradeButton.anchor.setTo(0.5,0.5);
         upgradeButtonSaltRock.anchor.setTo(0.5,0.5);
+        //circleButton.anchor.setTo(0.5,0.5);
 
         // Scale of the images
         saltSprite.scale.setTo(0.5,0.5);
-        forestBackground.scale.setTo(2, 1.5);
+        mineBackground.scale.setTo(1.01, 1.1);
         saveButton.scale.setTo(0.15,0.15);
         upgradeButton.scale.setTo(0.5,0.5);
         upgradeButtonSaltRock.scale.setTo(0.5,0.5);
+        //circleButton.scale.setTo(0.07,0.07);
 
         // Input text initializer
         clickText = game.add.text(250, 16, '', { fill: '#ffffff' });
 
-        //  Enables all kind of input actions on this image (click, etc)
-    	saltSprite.inputEnabled = true;
-
+        // Enables all kind of input actions on the salt sprite
+        saltSprite.inputEnabled = true;
         saltSprite.input.pixelPerfectOver = true;
         saltSprite.input.pixelPerfectClick = true;
-
         saltSprite.input.useHandCursor = true;
+
+        // Enables all kind of input actions on the circleButton
+        //circleButton.inputEnabled = true;
+        //circleButton.input.pixelPerfectOver = true;
+        //circleButton.input.pixelPerfectClick = true;
+        //circleButton.input.useHandCursor = true;        
 
        	// User inputs
         saltSprite.events.onInputDown.add(saltClickDown, this);
@@ -136,17 +149,39 @@ var GameState = {
 	},
 
 	update: function() {
-
+        //game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds() % 10, 32, 32);
 	},
 
     saltTimer: function() {
+        var nextDivisibleNumber = lastTime + (saveInterval - (lastTime % saveInterval));
+        var timeNow = Math.round(this.game.time.totalElapsedSeconds()); 
         if (this.player.saltPerSecond){
-            this.player.salt += this.player.saltPerSecond;
+            this.player.salt += (timeNow - lastTime) * this.player.saltPerSecond;
             this.playerSaltText.text = 'Sal: ' + this.player.salt;
         }
+        if ((lastTime < nextDivisibleNumber) && (timeNow >= nextDivisibleNumber)){
+            this.saveStatsOnDB();
+        }
+        lastTime = Math.round(this.game.time.totalElapsedSeconds())
+    },
+
+    // Save user stats on DB
+    saveStatsOnDB: function() {
+        $.ajax({
+            type: "POST",
+            beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
+            url: "/pages/set_stats",
+            data: "salt=" + this.player.salt +"&current_user=" + gon.current_user + "&saltPerSecond=" + this.player.saltPerSecond + "&clickDamage=" + this.player.clickDmg,
+            success: function(msg){   
+            }
+        });  
     }
 
 };
+
+//function circleButtonClick () {
+
+//}
 
 function upgradeButtonSaltRockClick () {
     if (this.player.salt >= this.player.upgradeSaltRockPrize){
@@ -190,16 +225,7 @@ function upgradeButtonClick () {
 
 // On save button click
 function saveButtonClick () {
-    // Save user stats on DB
-    $.ajax({
-        type: "POST",
-        beforeSend: function(xhr) {xhr.setRequestHeader('X-CSRF-Token', $('meta[name="csrf-token"]').attr('content'))},
-        url: "/pages/set_stats",
-        data: "salt=" + this.player.salt +"&current_user=" + gon.current_user + "&saltPerSecond=" + this.player.saltPerSecond + "&clickDamage=" + this.player.clickDmg,
-        success: function(msg){   
-            alert("Cambio guardados correctamente!")
-        }
-    });  
+    this.saveStatsOnDB();
 }
 
 // On salt image click down
